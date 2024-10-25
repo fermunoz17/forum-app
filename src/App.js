@@ -11,13 +11,13 @@ import ViewPosts from './ViewPosts';
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDTBzcOASlhZqaoNDLTsuDvmVZD7ZAN4HM",
-  authDomain: "forum-app-36bf6.firebaseapp.com",
-  projectId: "forum-app-36bf6",
-  storageBucket: "forum-app-36bf6.appspot.com",
-  messagingSenderId: "877596523195",
-  appId: "1:877596523195:web:8132f3ff5d191eb009879e",
-  measurementId: "G-XZ92PLZDG7"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
