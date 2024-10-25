@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
+
 
 const CreatePost = () => {
     const [title, setTitle] = useState('');
@@ -9,6 +11,8 @@ const CreatePost = () => {
     const [success, setSuccess] = useState('');
     const auth = getAuth();  // Get Firebase Auth instance
     const db = getFirestore();  // Get Firestore instance
+    const navigate = useNavigate();  // Initialize navigation hook
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -40,6 +44,11 @@ const CreatePost = () => {
         }
     };
 
+    // Handle back navigation to the dashboard
+    const handleBack = () => {
+        navigate('/dashboard');  // Navigate back to the dashboard
+    };
+
     return (
         <div className="create-post">
             <h1>Create a New Thread</h1>
@@ -61,6 +70,11 @@ const CreatePost = () => {
                 />
                 <button type="submit">Submit</button>
             </form>
+
+            {/* Back to Dashboard Button */}
+            <button onClick={handleBack} className="back-btn">
+                Back to Dashboard
+            </button>
         </div>
     );
 };
