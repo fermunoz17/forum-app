@@ -32,7 +32,7 @@ const SignUp = () => {
     };
 
     return (
-        <div className="sign-up">
+        <div class="container">
             <h2>Sign Up</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {success && <p style={{ color: 'green' }}>{success}</p>}

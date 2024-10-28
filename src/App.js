@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
+//import './App.css';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
@@ -100,7 +100,7 @@ const LoginOrSignUp = () => {
 
   return (
     <header className="App-header">
-      <h1>{showSignUp ? 'Sign Up for MyTwitter' : 'Login to MyTwitter'}</h1>
+      <h1>{showSignUp ? 'Sign Up for Y' : 'Login to Y'}</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={showSignUp ? handleSignUp : handleLogin}>
         <input

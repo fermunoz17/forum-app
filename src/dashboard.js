@@ -1,5 +1,5 @@
 import React from 'react';
-import './dashboard.css'; // Import dashboard-specific styles
+import './styles.css'; // Import dashboard-specific styles
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 const Dashboard = ({ onLogout }) => {
@@ -23,7 +23,7 @@ const Dashboard = ({ onLogout }) => {
 
     return (
         <div className="dashboard">
-            <h1>Welcome to MyTwitter Dashboard</h1>
+            <h1>Welcome to Y</h1>
             <p>Manage your account and posts here.</p>
 
             <div className="dashboard-actions">

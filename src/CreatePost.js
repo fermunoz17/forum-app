@@ -52,29 +52,31 @@ const CreatePost = () => {
     return (
         <div className="create-post">
             <h1>Create a New Thread</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {success && <p style={{ color: 'green' }}>{success}</p>}
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Post Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                />
-                <textarea
-                    placeholder="Post Content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    required
-                />
-                <button type="submit">Submit</button>
-            </form>
+            <div className="title-name">
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {success && <p style={{ color: 'green' }}>{success}</p>}
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        placeholder="Post Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                    />
+                    <textarea
+                        placeholder="Post Content"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        required
+                    />
+                    <button type="submit">Submit</button>
+                </form>
 
-            {/* Back to Dashboard Button */}
-            <button onClick={handleBack} className="back-btn">
-                Back to Dashboard
-            </button>
+                {/* Back to Dashboard Button */}
+                <button onClick={handleBack} className="back-btn">
+                    Back to Dashboard
+                </button>
+            </div>
         </div>
     );
 };
