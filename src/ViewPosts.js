@@ -1,21 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore'; // Added `deleteDoc` and `doc` imports
 import { getAuth } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
+import { useNavigate } from 'react-router-dom';
 
 const ViewPosts = () => {
     const [threads, setThreads] = useState([]);
-    const [replies, setReplies] = useState({});  // State to store replies for each thread
+    const [replies, setReplies] = useState({});
     const [replyContent, setReplyContent] = useState({});
     const auth = getAuth();
-    const db = getFirestore();  // Get Firestore instance
-    const navigate = useNavigate();  // Initialize navigation hook
+    const db = getFirestore();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch threads from Firestore, ordered by the creation time (newest first)
+        const fetchReplies = (threadId) => {
+            const repliesRef = collection(db, 'threads', threadId, 'replies');
+            const q = query(repliesRef, orderBy('createdAt', 'asc'));
+    
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                const threadReplies = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setReplies(prev => ({
+                    ...prev,
+                    [threadId]: threadReplies
+                }));
+            });
+    
+            return unsubscribe;
+        };
         const q = query(collection(db, 'threads'), orderBy('createdAt', 'desc'));
 
-        // Real-time listener for Firestore data
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const threadsData = snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -23,35 +38,16 @@ const ViewPosts = () => {
             }));
             setThreads(threadsData);
 
-            // Automatically fetch replies for each thread
             snapshot.docs.forEach(docSnapshot => {
-                fetchReplies(docSnapshot.id);  // Fetch replies as soon as the thread is loaded
+                fetchReplies(docSnapshot.id);
             });
         });
 
         return () => unsubscribe();
     }, [db]);
 
-    // Fetch replies for a specific thread
-    const fetchReplies = (threadId) => {
-        const repliesRef = collection(db, 'threads', threadId, 'replies');
-        const q = query(repliesRef, orderBy('createdAt', 'asc'));
+   
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const threadReplies = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setReplies(prev => ({
-                ...prev,
-                [threadId]: threadReplies
-            }));
-        });
-
-        return unsubscribe;  // Cleanup listener on unmount
-    };
-
-    // Handle reply submission
     const handleReplySubmit = async (e, threadId) => {
         e.preventDefault();
         const user = auth.currentUser;
@@ -61,27 +57,52 @@ const ViewPosts = () => {
         }
 
         const reply = {
-            content: replyContent[threadId] || '',  // Use the reply content for the specific thread
+            content: replyContent[threadId] || '',
             authorId: user.uid,
             createdAt: serverTimestamp(),
         };
 
         try {
             await addDoc(collection(db, 'threads', threadId, 'replies'), reply);
-            setReplyContent(prev => ({ ...prev, [threadId]: '' }));  // Clear the reply input for the thread
+            setReplyContent(prev => ({ ...prev, [threadId]: '' }));
         } catch (err) {
             console.error('Error submitting reply:', err);
         }
     };
 
-    // Handle reply content input change
     const handleReplyChange = (threadId, content) => {
         setReplyContent(prev => ({ ...prev, [threadId]: content }));
     };
+    const handleDeleteThread = async (threadId) => {
+        try {
+            const user = auth.currentUser;
+            if (!user) {
+                alert('You must be logged in to delete a post.');
+                return;
+            }
+    
+            // Log the thread ID before attempting deletion
+            console.log('Attempting to delete thread with ID:', threadId);
+    
+            // Attempt to delete the document from Firestore
+            await deleteDoc(doc(db, 'threads', threadId));
+            
+            // Log success if deletion goes through
+            console.log(`Thread with ID ${threadId} deleted from Firestore.`);
+    
+            // Update state to remove the deleted thread from the local UI
+            setThreads(threads.filter(thread => thread.id !== threadId));  // Remove deleted thread from state
+    
+        } catch (err) {
+            // Log any errors with detailed message
+            console.error('Error deleting thread:', err.message);
+            alert('Failed to delete the post. Check console for details.');
+        }
+    };
+    
 
-    // Handle back navigation to the dashboard
     const handleBack = () => {
-        navigate('/dashboard');  // Navigate back to the dashboard
+        navigate('/dashboard');
     };
 
     return (
@@ -97,6 +118,14 @@ const ViewPosts = () => {
                                 Posted by {thread.authorId} on{' '}
                                 {thread.createdAt?.toDate().toLocaleString()}
                             </small>
+
+                            {/* Delete Button */}
+                            <button
+                                onClick={() => handleDeleteThread(thread.id)} // Added Delete button with onClick handler
+                                style={{ color: 'red', marginLeft: '10px' }}
+                            >
+                                Delete
+                            </button>
 
                             {/* Display Replies */}
                             <div className="replies-section">
@@ -133,7 +162,6 @@ const ViewPosts = () => {
                 <p>No threads available yet. Be the first to create one!</p>
             )}
 
-            {/* Back to Dashboard Button */}
             <button onClick={handleBack} className="back-btn">
                 Back to Dashboard
             </button>
