@@ -73,33 +73,38 @@ const ViewPosts = () => {
     const handleReplyChange = (threadId, content) => {
         setReplyContent(prev => ({ ...prev, [threadId]: content }));
     };
-    const handleDeleteThread = async (threadId) => {
-        try {
-            const user = auth.currentUser;
-            if (!user) {
-                alert('You must be logged in to delete a post.');
-                return;
-            }
+
+    const handleDeleteThread = async (threadId, authorId) => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('You must be logged in to delete a post.');
+            return;
+        }
     
+        // Check if the logged-in user is the author of the thread
+        if (user.uid !== authorId) {
+            alert('You can only delete your own posts.');
+            return;
+        }
+    
+        try {
             // Log the thread ID before attempting deletion
             console.log('Attempting to delete thread with ID:', threadId);
     
             // Attempt to delete the document from Firestore
             await deleteDoc(doc(db, 'threads', threadId));
-            
+    
             // Log success if deletion goes through
             console.log(`Thread with ID ${threadId} deleted from Firestore.`);
     
             // Update state to remove the deleted thread from the local UI
-            setThreads(threads.filter(thread => thread.id !== threadId));  // Remove deleted thread from state
-    
+            setThreads(threads.filter(thread => thread.id !== threadId));
         } catch (err) {
             // Log any errors with detailed message
             console.error('Error deleting thread:', err.message);
             alert('Failed to delete the post. Check console for details.');
         }
     };
-    
 
     const handleBack = () => {
         navigate('/dashboard');
@@ -121,7 +126,7 @@ const ViewPosts = () => {
 
                             {/* Delete Button */}
                             <button
-                                onClick={() => handleDeleteThread(thread.id)} // Added Delete button with onClick handler
+                                onClick={() => handleDeleteThread(thread.id, thread.authorId)}
                                 style={{ color: 'red', marginLeft: '10px' }}
                             >
                                 Delete
