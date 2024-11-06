@@ -1,5 +1,7 @@
 import React from 'react';
-import './dashboard.css'; // Import dashboard-specific styles
+import TopBar from './TopBar';
+
+import './styles.css'; // Import dashboard-specific styles
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 const Dashboard = ({ onLogout }) => {
@@ -22,22 +24,20 @@ const Dashboard = ({ onLogout }) => {
     };
 
     return (
-        <div className="dashboard">
-            <h1>Welcome to MyTwitter Dashboard</h1>
-            <p>Manage your account and posts here.</p>
-
+        <div>
             <div className="dashboard-actions">
-                <button onClick={handleCreatePost} className="dashboard-btn">
-                    Create Post
-                </button>
-                <button onClick={handleViewPosts} className="dashboard-btn">
-                    View Posts
+                <div className="top-buttons">
+                    <button onClick={handleCreatePost} className="dashboard-btn">
+                        Create Post
+                    </button>
+                    <button onClick={handleViewPosts} className="dashboard-btn">
+                        View Posts
+                    </button>
+                </div>
+                <button onClick={handleLogout} className="dashboard-btn logout-btn">
+                    Logout
                 </button>
             </div>
-
-            <button onClick={handleLogout} className="dashboard-btn logout-btn">
-                Logout
-            </button>
         </div>
     );
 };

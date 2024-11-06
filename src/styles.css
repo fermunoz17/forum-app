@@ -5,8 +5,107 @@
     font-family: Arial, sans-serif;
 }
 
+/*create post*/
+
+.create-post {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    justify-content: center;
+}
+
+.title-name {
+    text-align: center;
+    justify-content: center;
+}
+
+.post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    justify-content: center;
+}
+
+.submit-btn {
+    padding: 15px 20px;
+    background-color: #0c85d0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: #0a6fae;
+}
+
+.back-btn {
+    margin-top: auto;
+    background-color: #ff4d4d;
+}
+
+.back-btn:hover {
+    background-color: #d43f3f;
+}
+
+/*dashboard*/
+
+.dashboard {
+    text-align: left;
+    margin-top: 50px;
+}
+
+.dashboard h1 {
+    font-size: 2rem;
+}
+
+.dashboard p {
+    margin-bottom: 20px;
+}
+
+.dashboard-actions {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: center;
+    gap: 20px; /* Space between buttons */
+    margin-bottom: 30px;
+    padding: 30px;
+}
+
+.top-buttons {
+    display: flex;
+    gap: 10px; /* Space between the two top buttons */
+}
+
+.dashboard-btn {
+    padding: 15px 20px;
+    background-color: #0c85d0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.dashboard-btn:hover {
+    background-color: #0a6fae;
+}
+
+.logout-btn {
+    margin-top: auto;
+    background-color: #ff4d4d;
+}
+
+.logout-btn:hover {
+    background-color: #d43f3f;
+}
+
 body {
-    background-color: #f5f8fa;
+    background-color: #071a1a;  
+    color: #ffffff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -70,6 +169,10 @@ body {
     margin-top: 30px;
 }
 
+.view-posts{
+    margin-top: 1000px;
+}
+
 #signin-form {
     display: flex;
     flex-direction: column;
@@ -97,3 +200,4 @@ body {
 #signin-form button:hover {
     background-color: #0d8fe6;
 }
+

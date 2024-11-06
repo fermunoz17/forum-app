@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-
+import Layout from './Layout';
 import SignUp from './SignUp';
 import Dashboard from './dashboard';
 import CreatePost from './CreatePost';
@@ -49,16 +48,18 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Routes>
-          {/* Default route - if the user is logged in, go to dashboard; otherwise, show login/signup */}
-          <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LoginOrSignUp />} />
-          {/* If the user is logged in, go to dashboard; otherwise, redirect to login */}
-          <Route path="/dashboard" element={user ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/" />} />
-          {/* If the user is logged in, allow post creation; otherwise, redirect to login */}
-          <Route path="/create-post" element={user ? <CreatePost /> : <Navigate to="/" />} />
-          {/* If the user is logged in, show posts; otherwise, redirect to login */}
-          <Route path="/view-posts" element={user ? <ViewPosts /> : <Navigate to="/" />} />
-        </Routes>
+        <Layout>
+          <Routes>
+            {/* Default route - if the user is logged in, go to dashboard; otherwise, show login/signup */}
+            <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LoginOrSignUp />} />
+            {/* If the user is logged in, go to dashboard; otherwise, redirect to login */}
+            <Route path="/dashboard" element={user ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/" />} />
+            {/* If the user is logged in, allow post creation; otherwise, redirect to login */}
+            <Route path="/create-post" element={user ? <CreatePost /> : <Navigate to="/" />} />
+            {/* If the user is logged in, show posts; otherwise, redirect to login */}
+            <Route path="/view-posts" element={user ? <ViewPosts /> : <Navigate to="/" />} />
+          </Routes>
+        </Layout>
       </div>
     </Router>
   );
@@ -100,7 +101,7 @@ const LoginOrSignUp = () => {
 
   return (
     <header className="App-header">
-      <h1>{showSignUp ? 'Sign Up for MyTwitter' : 'Login to MyTwitter'}</h1>
+      <h1>{showSignUp ? 'Sign Up' : 'Login'}</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={showSignUp ? handleSignUp : handleLogin}>
         <input
