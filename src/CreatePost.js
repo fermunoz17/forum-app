@@ -52,10 +52,9 @@ const CreatePost = () => {
     return (
         <div className="create-post">
             <h1>Create a New Thread</h1>
-            <div className="title-name">
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 {success && <p style={{ color: 'green' }}>{success}</p>}
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className='submit-form'>
                     <div className='post-form'>
                         <input 
                             type="text"
@@ -78,7 +77,6 @@ const CreatePost = () => {
                 <button onClick={handleBack} className="submit-btn back-btn">
                     Back to Dashboard
                 </button>
-            </div>
         </div>
     );
 };

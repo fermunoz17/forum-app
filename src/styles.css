@@ -10,22 +10,22 @@
 .create-post {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    text-align: center;
-    justify-content: center;
+    gap: 20px; 
 }
 
-.title-name {
-    text-align: center;
-    justify-content: center;
+.submit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+    align-items: self-start;
 }
 
 .post-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    text-align: center;
-    justify-content: center;
+    align-self: stretch;
 }
 
 .submit-btn {
@@ -39,7 +39,7 @@
 }
 
 .submit-btn:hover {
-    background-color: #0a6fae;
+    background-color: #0a6fae;   
 }
 
 .back-btn {
@@ -170,7 +170,7 @@ body {
 }
 
 .view-posts{
-    margin-top: 1000px;
+    margin-top: 850px;
 }
 
 #signin-form {
