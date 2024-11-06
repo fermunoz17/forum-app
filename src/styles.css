@@ -5,6 +5,16 @@
     font-family: Arial, sans-serif;
 }
 
+body {
+    background-color: #071a1a;  
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
 /*create post*/
 
 .create-post {
@@ -103,15 +113,61 @@
     background-color: #d43f3f;
 }
 
-body {
-    background-color: #071a1a;  
-    color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+/* view post*/
+
+.view-posts {
+    color: #071a1a;
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto; /* Center the box */
 }
+
+.box-threads {
+    list-style-type: none; /* Remove default list styling */
+    padding: 0;
+}
+
+.box-threads li {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 8px;
+    background-color: #f9f9f9; /* Light background */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+}
+
+.replies-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ccc; /* Border to separate replies */
+}
+
+.replies-section h4 {
+    margin-bottom: 5px;
+}
+
+.replies-section form {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.replies-section input[type="text"] {
+    flex-grow: 1; /* Allow the input to take remaining space */
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.replies-section button {
+    padding: 8px 12px;
+    background-color: #0c85d0;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 
 .header {
     width: 100%;
@@ -167,10 +223,6 @@ body {
 
 .form-container {
     margin-top: 30px;
-}
-
-.view-posts{
-    margin-top: 850px;
 }
 
 #signin-form {
