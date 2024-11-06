@@ -56,24 +56,26 @@ const CreatePost = () => {
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 {success && <p style={{ color: 'green' }}>{success}</p>}
                 <form onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        placeholder="Post Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        required
-                    />
-                    <textarea
-                        placeholder="Post Content"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        required
-                    />
-                    <button type="submit">Submit</button>
+                    <div className='post-form'>
+                        <input 
+                            type="text"
+                            placeholder="Post Title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            required
+                        />
+                        <textarea 
+                            placeholder="Post Content"
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit" className='submit-btn'>Submit</button>
                 </form>
 
                 {/* Back to Dashboard Button */}
-                <button onClick={handleBack} className="back-btn">
+                <button onClick={handleBack} className="submit-btn back-btn">
                     Back to Dashboard
                 </button>
             </div>

@@ -5,10 +5,53 @@
     font-family: Arial, sans-serif;
 }
 
+/*create post*/
+
 .create-post {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     text-align: center;
     justify-content: center;
 }
+
+.title-name {
+    text-align: center;
+    justify-content: center;
+}
+
+.post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    justify-content: center;
+}
+
+.submit-btn {
+    padding: 15px 20px;
+    background-color: #0c85d0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: #0a6fae;
+}
+
+.back-btn {
+    margin-top: auto;
+    background-color: #ff4d4d;
+}
+
+.back-btn:hover {
+    background-color: #d43f3f;
+}
+
+/*dashboard*/
 
 .dashboard {
     text-align: left;
@@ -25,13 +68,20 @@
 
 .dashboard-actions {
     display: flex;
-    justify-content: center;
-    gap: 20px;
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: center;
+    gap: 20px; /* Space between buttons */
     margin-bottom: 30px;
+    padding: 30px;
+}
+
+.top-buttons {
+    display: flex;
+    gap: 10px; /* Space between the two top buttons */
 }
 
 .dashboard-btn {
-    padding: 10px 20px;
+    padding: 15px 20px;
     background-color: #0c85d0;
     color: white;
     border: none;
@@ -41,10 +91,11 @@
 }
 
 .dashboard-btn:hover {
-    background-color: #0c85d0;
+    background-color: #0a6fae;
 }
 
 .logout-btn {
+    margin-top: auto;
     background-color: #ff4d4d;
 }
 
@@ -53,20 +104,13 @@
 }
 
 body {
-    background-color: #071a1a;
-    background-image: url("https://media.wvutech.edu/files/d/19e7d143-53b7-4baa-8f97-22c2373ebff6/dr-bhanukiran-gurijala.jpg");
-    background-size: 100%;
-    color: #000000;
+    background-color: #071a1a;  
+    color: #ffffff;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-}
-
-.title-name {
-    text-align: center;
-    justify-content: center;
 }
 
 .header {
@@ -125,6 +169,10 @@ body {
     margin-top: 30px;
 }
 
+.view-posts{
+    margin-top: 1000px;
+}
+
 #signin-form {
     display: flex;
     flex-direction: column;
@@ -152,3 +200,4 @@ body {
 #signin-form button:hover {
     background-color: #0d8fe6;
 }
+
