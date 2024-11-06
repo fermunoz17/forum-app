@@ -17,6 +17,7 @@
   position: absolute;
   left: 10px; /* Adjust as needed for padding from the left */
   height: 30px; /* Adjust logo size */
+  margin-top: -15px;
 }
 
 .title {

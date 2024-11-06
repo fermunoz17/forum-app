@@ -114,7 +114,7 @@ const ViewPosts = () => {
         <div className="view-posts">
             <h1>All Threads</h1>
             {threads.length > 0 ? (
-                <ul>
+                <ul className='box-threads'>
                     {threads.map((thread) => (
                         <li key={thread.id}>
                             <h3>{thread.title}</h3>
