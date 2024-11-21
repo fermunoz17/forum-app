@@ -7,6 +7,9 @@ import SignUp from './SignUp';
 import Dashboard from './dashboard';
 import CreatePost from './CreatePost';
 import ViewPosts from './ViewPosts';
+import Profiles from './Profiles';
+import UserPosts from './UserPosts'; 
+
 
 // Firebase configuration
 const firebaseConfig = {
@@ -58,6 +61,8 @@ function App() {
             <Route path="/create-post" element={user ? <CreatePost /> : <Navigate to="/" />} />
             {/* If the user is logged in, show posts; otherwise, redirect to login */}
             <Route path="/view-posts" element={user ? <ViewPosts /> : <Navigate to="/" />} />
+            <Route path="/profiles" element={user ? <Profiles /> : <Navigate to="/" />} />
+            <Route path="/user-posts/:userId" element={user ? <UserPosts /> : <Navigate to="/" />} />
           </Routes>
         </Layout>
       </div>
