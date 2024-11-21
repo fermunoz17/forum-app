@@ -112,7 +112,7 @@ const ViewPosts = () => {
 
     return (
         <div className="view-posts">
-            <h1>All Threads</h1>
+            <h1 className='view-posts-title'>Threads</h1>
             {threads.length > 0 ? (
                 <ul className='box-threads'>
                     {threads.map((thread) => (
@@ -127,7 +127,7 @@ const ViewPosts = () => {
                             {/* Delete Button */}
                             <button
                                 onClick={() => handleDeleteThread(thread.id, thread.authorId)}
-                                style={{ color: 'red', marginLeft: '10px' }}
+                                className='submit-btn back-btn delete-btn'
                             >
                                 Delete
                             </button>
@@ -167,7 +167,7 @@ const ViewPosts = () => {
                 <p>No threads available yet. Be the first to create one!</p>
             )}
 
-            <button onClick={handleBack} className="back-btn">
+            <button onClick={handleBack} className="submit-btn back-btn">
                 Back to Dashboard
             </button>
         </div>
