@@ -22,6 +22,10 @@ const Dashboard = ({ onLogout }) => {
         onLogout();  // Call the original onLogout passed from App.js
         navigate('/');  // Navigate back to the home or login page
     };
+    const handleViewProfiles = () => {
+        navigate('/profiles'); // Redirige al usuario a la página de perfiles
+    };
+    
 
     return (
         <div>
@@ -33,10 +37,15 @@ const Dashboard = ({ onLogout }) => {
                     <button onClick={handleViewPosts} className="dashboard-btn">
                         View Posts
                     </button>
-                </div>
-                <button onClick={handleLogout} className="dashboard-btn logout-btn">
-                    Logout
-                </button>
+                    <button onClick={handleViewProfiles} className="dashboard-btn">
+                     View Profiles
+                    </button>
+                    </div>
+                    <button onClick={handleLogout} className="dashboard-btn logout-btn">
+                        Logout
+                    </button>
+                
+
             </div>
         </div>
     );
