@@ -11,7 +11,6 @@ import {
     serverTimestamp,
     updateDoc,
     increment,
-    getDoc
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +19,7 @@ const ViewPosts = () => {
     const [threads, setThreads] = useState([]);
     const [replies, setReplies] = useState({});
     const [replyContent, setReplyContent] = useState({});
+
     const auth = getAuth();
     const db = getFirestore();
     const navigate = useNavigate();
@@ -30,36 +30,35 @@ const ViewPosts = () => {
             const q = query(repliesRef, orderBy('createdAt', 'asc'));
 
             const unsubscribe = onSnapshot(q, (snapshot) => {
-                const threadReplies = snapshot.docs.map(doc => ({
+                const threadReplies = snapshot.docs.map((doc) => ({
                     id: doc.id,
-                    ...doc.data()
+                    ...doc.data(),
                 }));
-                setReplies(prev => ({
+                setReplies((prev) => ({
                     ...prev,
-                    [threadId]: threadReplies
+                    [threadId]: threadReplies,
                 }));
             });
 
             return unsubscribe;
         };
+
         const q = query(collection(db, 'threads'), orderBy('createdAt', 'desc'));
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            const threadsData = snapshot.docs.map(doc => ({
+            const threadsData = snapshot.docs.map((doc) => ({
                 id: doc.id,
-                ...doc.data()
+                ...doc.data(),
             }));
             setThreads(threadsData);
 
-            snapshot.docs.forEach(docSnapshot => {
-                fetchReplies(docSnapshot.id);
+            snapshot.docs.forEach((docSnapshot) => {
+                fetchReplies(docSnapshot.id); // Fetch replies for the thread
             });
         });
 
         return () => unsubscribe();
     }, [db]);
-
-
 
     const handleReplySubmit = async (e, threadId) => {
         e.preventDefault();
@@ -77,14 +76,14 @@ const ViewPosts = () => {
 
         try {
             await addDoc(collection(db, 'threads', threadId, 'replies'), reply);
-            setReplyContent(prev => ({ ...prev, [threadId]: '' }));
+            setReplyContent((prev) => ({ ...prev, [threadId]: '' }));
         } catch (err) {
             console.error('Error submitting reply:', err);
         }
     };
 
     const handleReplyChange = (threadId, content) => {
-        setReplyContent(prev => ({ ...prev, [threadId]: content }));
+        setReplyContent((prev) => ({ ...prev, [threadId]: content }));
     };
 
     const handleDeleteThread = async (threadId, authorId) => {
@@ -94,28 +93,16 @@ const ViewPosts = () => {
             return;
         }
 
-        // Check if the logged-in user is the author of the thread
         if (user.uid !== authorId) {
             alert('You can only delete your own posts.');
             return;
         }
 
         try {
-            // Log the thread ID before attempting deletion
-            console.log('Attempting to delete thread with ID:', threadId);
-
-            // Attempt to delete the document from Firestore
             await deleteDoc(doc(db, 'threads', threadId));
-
-            // Log success if deletion goes through
-            console.log(`Thread with ID ${threadId} deleted from Firestore.`);
-
-            // Update state to remove the deleted thread from the local UI
-            setThreads(threads.filter(thread => thread.id !== threadId));
+            setThreads(threads.filter((thread) => thread.id !== threadId));
         } catch (err) {
-            // Log any errors with detailed message
-            console.error('Error deleting thread:', err.message);
-            alert('Failed to delete the post. Check console for details.');
+            console.error('Error deleting thread:', err);
         }
     };
 
@@ -130,48 +117,46 @@ const ViewPosts = () => {
         }
     };
 
-
     const handleBack = () => {
         navigate('/dashboard');
     };
 
     return (
         <div className="view-posts">
-            <h1 className='view-posts-title'>Threads</h1>
+            <h1 className="view-posts-title">Threads</h1>
             {threads.length > 0 ? (
-                <ul className='box-threads'>
+                <ul className="box-threads">
                     {threads.map((thread) => (
                         <li key={thread.id}>
                             <h3>{thread.title}</h3>
                             <p>{thread.content}</p>
                             <small>
-                                Posted by {thread.authorId} on{' '}
+                                Posted by {thread.displayName || thread.authorId} on{' '}
                                 {thread.createdAt?.toDate().toLocaleString()}
                             </small>
 
                             <div className="thread-actions">
-                                <button onClick={() => handleLike(thread.id)}>Like</button>
+                                <button className="like-bttn" onClick={() => handleLike(thread.id)}>Like</button>
                                 <span>{thread.likes || 0} Likes</span>
                             </div>
 
-
-                            {/* Delete Button */}
                             <button
                                 onClick={() => handleDeleteThread(thread.id, thread.authorId)}
-                                className='submit-btn back-btn delete-btn'
+                                className="submit-btn back-btn delete-btn"
                             >
                                 Delete
                             </button>
 
-                            {/* Display Replies */}
                             <div className="replies-section">
                                 <h4>Replies:</h4>
                                 {replies[thread.id] && replies[thread.id].length > 0 ? (
                                     <ul>
-                                        {replies[thread.id].map(reply => (
+                                        {replies[thread.id].map((reply) => (
                                             <li key={reply.id}>
                                                 <p>{reply.content}</p>
-                                                <small>By {reply.authorId} on {reply.createdAt?.toDate().toLocaleString()}</small>
+                                                <small>
+                                                    By {reply.authorId} on {reply.createdAt?.toDate().toLocaleString()}
+                                                </small>
                                             </li>
                                         ))}
                                     </ul>
@@ -179,7 +164,6 @@ const ViewPosts = () => {
                                     <p>No replies yet.</p>
                                 )}
 
-                                {/* Reply Form */}
                                 <form onSubmit={(e) => handleReplySubmit(e, thread.id)}>
                                     <input
                                         type="text"

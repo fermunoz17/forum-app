@@ -15,12 +15,23 @@
 
 .logo {
   position: absolute;
-  left: 10px; /* Adjust as needed for padding from the left */
-  height: 30px; /* Adjust logo size */
+  left: 10px;
+  /* Adjust as needed for padding from the left */
+  height: 30px;
+  /* Adjust logo size */
   margin-top: -15px;
+  cursor: pointer;
 }
 
 .title {
-  font-size: 18px; /* Adjust text size */
+  margin-top: 20px;
+  font-size: 30px;
+  /* Adjust text size */
   text-align: center;
+}
+
+.top-bar-bttn {
+  background-color: transparent;
+  border: none;
+  cursor: none;
 }

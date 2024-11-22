@@ -11,8 +11,8 @@ const TopBar = () => {
 
   return (
     <div className="top-bar">
-      <button onClick={handledashboard}>
-        <img src="/Red-letter-Y-isolated-on-transparent-background-PNG.png" alt="Y-logo" className="logo" />
+      <button className="top-bar-bttn" onClick={handledashboard}>
+        <img src="/favicon.ico" alt="Y-logo" className="logo" />
       </button>
       <h1 className="title">Welcome to Y</h1>
     </div>

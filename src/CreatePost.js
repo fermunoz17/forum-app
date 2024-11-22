@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
-
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 const CreatePost = () => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [displayName, setDisplayName] = useState(''); // State to store the user's displayName
     const auth = getAuth();  // Get Firebase Auth instance
     const db = getFirestore();  // Get Firestore instance
     const navigate = useNavigate();  // Initialize navigation hook
 
+    // Retrieve the user's displayName on component mount
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setDisplayName(user.displayName || 'Anonymous'); // Default to 'Anonymous' if no displayName
+            } else {
+                setDisplayName('Anonymous');
+            }
+        });
+
+        return () => unsubscribe();
+    }, [auth]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -29,6 +41,7 @@ const CreatePost = () => {
                 title: title,
                 content: content,
                 authorId: user.uid,  // Store the current user's ID
+                displayName: displayName,  // Include the displayName
                 createdAt: serverTimestamp(),  // Use server-side timestamp
             });
 
@@ -52,31 +65,31 @@ const CreatePost = () => {
     return (
         <div className="create-post">
             <h1>Create a New Thread</h1>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {success && <p style={{ color: 'green' }}>{success}</p>}
-                <form onSubmit={handleSubmit} className='submit-form'>
-                    <div className='post-form'>
-                        <input 
-                            type="text"
-                            placeholder="Post Title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            required
-                        />
-                        <textarea 
-                            placeholder="Post Content"
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <button type="submit" className='submit-btn'>Submit</button>
-                </form>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {success && <p style={{ color: 'green' }}>{success}</p>}
+            <form onSubmit={handleSubmit} className="submit-form">
+                <div className="post-form">
+                    <input
+                        type="text"
+                        placeholder="Post Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                    />
+                    <textarea
+                        placeholder="Post Content"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        required
+                    />
+                </div>
+                <button type="submit" className="submit-btn">Submit</button>
+            </form>
 
-                {/* Back to Dashboard Button */}
-                <button onClick={handleBack} className="submit-btn back-btn">
-                    Back to Dashboard
-                </button>
+            {/* Back to Dashboard Button */}
+            <button onClick={handleBack} className="submit-btn back-btn">
+                Back to Dashboard
+            </button>
         </div>
     );
 };
