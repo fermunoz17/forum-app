@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore'; // Added `deleteDoc` and `doc` imports
+import {
+    getFirestore,
+    collection,
+    query,
+    orderBy,
+    onSnapshot,
+    addDoc,
+    deleteDoc,
+    doc,
+    serverTimestamp,
+    updateDoc,
+    increment,
+    getDoc
+} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +28,7 @@ const ViewPosts = () => {
         const fetchReplies = (threadId) => {
             const repliesRef = collection(db, 'threads', threadId, 'replies');
             const q = query(repliesRef, orderBy('createdAt', 'asc'));
-    
+
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 const threadReplies = snapshot.docs.map(doc => ({
                     id: doc.id,
@@ -26,7 +39,7 @@ const ViewPosts = () => {
                     [threadId]: threadReplies
                 }));
             });
-    
+
             return unsubscribe;
         };
         const q = query(collection(db, 'threads'), orderBy('createdAt', 'desc'));
@@ -46,7 +59,7 @@ const ViewPosts = () => {
         return () => unsubscribe();
     }, [db]);
 
-   
+
 
     const handleReplySubmit = async (e, threadId) => {
         e.preventDefault();
@@ -80,23 +93,23 @@ const ViewPosts = () => {
             alert('You must be logged in to delete a post.');
             return;
         }
-    
+
         // Check if the logged-in user is the author of the thread
         if (user.uid !== authorId) {
             alert('You can only delete your own posts.');
             return;
         }
-    
+
         try {
             // Log the thread ID before attempting deletion
             console.log('Attempting to delete thread with ID:', threadId);
-    
+
             // Attempt to delete the document from Firestore
             await deleteDoc(doc(db, 'threads', threadId));
-    
+
             // Log success if deletion goes through
             console.log(`Thread with ID ${threadId} deleted from Firestore.`);
-    
+
             // Update state to remove the deleted thread from the local UI
             setThreads(threads.filter(thread => thread.id !== threadId));
         } catch (err) {
@@ -105,6 +118,18 @@ const ViewPosts = () => {
             alert('Failed to delete the post. Check console for details.');
         }
     };
+
+    const handleLike = async (threadId) => {
+        const threadRef = doc(db, 'threads', threadId);
+        try {
+            await updateDoc(threadRef, {
+                likes: increment(1),
+            });
+        } catch (err) {
+            console.error('Error liking thread:', err);
+        }
+    };
+
 
     const handleBack = () => {
         navigate('/dashboard');
@@ -123,6 +148,12 @@ const ViewPosts = () => {
                                 Posted by {thread.authorId} on{' '}
                                 {thread.createdAt?.toDate().toLocaleString()}
                             </small>
+
+                            <div className="thread-actions">
+                                <button onClick={() => handleLike(thread.id)}>Like</button>
+                                <span>{thread.likes || 0} Likes</span>
+                            </div>
+
 
                             {/* Delete Button */}
                             <button
