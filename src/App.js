@@ -8,6 +8,8 @@ import CreatePost from './CreatePost';
 import ViewPosts from './ViewPosts';
 import Profiles from './Profiles';
 import UserPosts from './UserPosts';
+import Settings from './Settings'; // Import the new Settings component
+
 
 // Firebase configuration
 const firebaseConfig = {
@@ -54,7 +56,9 @@ function App() {
             <Route path="/create-post" element={user ? <CreatePost /> : <Navigate to="/" />} />
             <Route path="/view-posts" element={user ? <ViewPosts /> : <Navigate to="/" />} />
             <Route path="/profiles" element={user ? <Profiles /> : <Navigate to="/" />} />
-            <Route path="/user-posts/:userId" element={user ? <UserPosts /> : <Navigate to="/" />} />          
+            <Route path="/user-posts/:userId" element={user ? <UserPosts /> : <Navigate to="/" />} />
+            <Route path="/settings" element={user ? <Settings /> : <Navigate to="/" />} />
+
           </Routes>
         </Layout>
       </div>
