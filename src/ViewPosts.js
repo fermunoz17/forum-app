@@ -16,14 +16,14 @@ import {
 import { getAuth } from 'firebase/auth';
 
 const ViewPosts = () => {
-    const [threads, setThreads] = useState([]); // Stores threads/posts
-    const [likedThreads, setLikedThreads] = useState([]); // Tracks liked threads by the user
-    const [replies, setReplies] = useState({}); // Tracks replies for threads
-    const [replyContent, setReplyContent] = useState({}); // Tracks reply input values
+    const [threads, setThreads] = useState([]);
+    const [likedThreads, setLikedThreads] = useState([]);
+    const [replies, setReplies] = useState({});
+    const [replyContent, setReplyContent] = useState({});
     const auth = getAuth();
     const db = getFirestore();
 
-    // Fetch threads/posts when component mounts
+    // Fetch threads when component mounts
     useEffect(() => {
         const q = query(collection(db, 'threads'), orderBy('createdAt', 'desc'));
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -33,7 +33,6 @@ const ViewPosts = () => {
             }));
             setThreads(threadsData);
 
-            // Fetch replies for each thread
             snapshot.docs.forEach((docSnapshot) => fetchReplies(docSnapshot.id));
         });
         return () => unsubscribe();
@@ -90,54 +89,83 @@ const ViewPosts = () => {
             createdAt: serverTimestamp(),
         };
 
+        const notificationsRef = collection(db, 'notifications');
+        const threadRef = doc(db, 'threads', threadId);
+
         try {
             await addDoc(collection(db, 'threads', threadId, 'replies'), reply);
-            setReplyContent((prev) => ({ ...prev, [threadId]: '' })); // Reset input
+
+            const threadDoc = await getDoc(threadRef);
+            if (threadDoc.exists()) {
+                const threadData = threadDoc.data();
+
+                // Create notification for the thread author
+                if (user.uid !== threadData.authorId) {
+                    await addDoc(notificationsRef, {
+                        userId: threadData.authorId,
+                        message: `${user.displayName || 'Someone'} replied to your post!`,
+                        postId: threadId,
+                        createdAt: serverTimestamp(),
+                    });
+                }
+            }
+
+            setReplyContent((prev) => ({ ...prev, [threadId]: '' }));
         } catch (err) {
-            console.error('Error submitting reply:', err);
+            console.error('Error submitting reply or creating notification:', err);
         }
     };
+
     // Handle liking/unliking a thread
     const handleLike = async (threadId) => {
-        const user = auth.currentUser; // Get the current user
+        const user = auth.currentUser;
         if (!user) {
             alert('You must be logged in to like a post.');
             return;
         }
 
-        const likeRef = doc(db, 'likes', user.uid, 'threadLikes', threadId); // Reference to user's like on this thread
-        const threadRef = doc(db, 'threads', threadId); // Reference to the thread
+        const likeRef = doc(db, 'likes', user.uid, 'threadLikes', threadId);
+        const threadRef = doc(db, 'threads', threadId);
+        const notificationsRef = collection(db, 'notifications');
 
         try {
             if (likedThreads.includes(threadId)) {
                 // Unlike the thread
-                await deleteDoc(likeRef); // Remove the like from the user's subcollection
+                await deleteDoc(likeRef);
                 await updateDoc(threadRef, {
-                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) - 1, // Decrement the like count
+                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) - 1,
                 });
-                setLikedThreads((prev) => prev.filter((id) => id !== threadId)); // Update local state
+                setLikedThreads((prev) => prev.filter((id) => id !== threadId));
             } else {
-                // Check if the user has already liked the thread in Firestore
-                const likeSnapshot = await getDoc(likeRef);
-                if (likeSnapshot.exists()) {
-                    console.warn('User has already liked this post.');
-                    return; // Exit if already liked
+                // Like the thread
+                await setDoc(likeRef, { likedAt: serverTimestamp() });
+                await updateDoc(threadRef, {
+                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) + 1,
+                });
+
+                // Fetch thread data to create a notification
+                const threadDoc = await getDoc(threadRef);
+                if (threadDoc.exists()) {
+                    const threadData = threadDoc.data();
+
+                    if (user.uid !== threadData.authorId) {
+                        await addDoc(notificationsRef, {
+                            userId: threadData.authorId,
+                            message: `${user.displayName || 'Someone'} liked your post!`,
+                            postId: threadId,
+                            createdAt: serverTimestamp(),
+                        });
+                    }
                 }
 
-                // Like the thread
-                await setDoc(likeRef, { likedAt: serverTimestamp() }); // Add like in user's subcollection
-                await updateDoc(threadRef, {
-                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) + 1, // Increment the like count
-                });
-                setLikedThreads((prev) => [...prev, threadId]); // Update local state
+                setLikedThreads((prev) => [...prev, threadId]);
             }
         } catch (err) {
             console.error('Error liking/unliking thread:', err);
         }
     };
 
-
-    // Handle deleting a thread/post
+    // Handle deleting a thread
     const handleDeleteThread = async (threadId, authorId) => {
         const user = auth.currentUser;
         if (!user || user.uid !== authorId) {
