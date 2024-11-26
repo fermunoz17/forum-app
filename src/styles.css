@@ -15,8 +15,7 @@ body {
     height: 100vh;
 }
 
-/*create post*/
-
+/*create post************************************/
 .create-post {
     display: flex;
     flex-direction: column;
@@ -61,36 +60,86 @@ body {
     background-color: #d43f3f;
 }
 
-/*dashboard*/
-
-.dashboard {
-    text-align: left;
-    margin-top: 50px;
+textarea {
+    width: 100%; 
+    height: 100px; 
+    resize: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box; 
+    outline: none;
+    transition: border-color 0.3s;
 }
 
-.dashboard h1 {
-    font-size: 2rem;
+textarea:focus {
+    border-color: #1da1f2; /* Optional: Highlight border on focus */
+}
+/*create post************************************/
+
+/*dashboard************************************/
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
-.dashboard p {
-    margin-bottom: 20px;
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
 }
 
-.dashboard-actions {
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: red;
+}
+
+.create-btn {
+    padding: 15px 20px;
+    background-color: #0c85d0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 20px;
+}
+
+.create-btn:hover {
+    background-color: #0a6fae;
+}
+
+.dashboard-container {
     display: flex;
     flex-direction: column;
-    /* Stack buttons vertically */
-    align-items: center;
-    gap: 20px;
-    /* Space between buttons */
-    margin-bottom: 30px;
-    padding: 30px;
-}
-
-.top-buttons {
+    padding: 20px;
+  }
+  
+.dashboard-content {
     display: flex;
+    flex-direction: column;
     gap: 10px;
-    /* Space between the two top buttons */
 }
 
 .dashboard-btn {
@@ -115,9 +164,9 @@ body {
 .logout-btn:hover {
     background-color: #d43f3f;
 }
+/*dashboard************************************/
 
-/* view post*/
-
+/*view post************************************/
 .view-posts-title {
     color: white;
     text-align: center;
@@ -126,12 +175,9 @@ body {
 
 .view-posts {
     overflow-y: hidden;
-    /* Hide both horizontal and vertical scrollbars */
     height: 100%;
-    /* Ensure it takes up full height */
     padding: 20px;
     margin-top: 20px;
-    /* Adjusted margin */
     max-width: 800px;
 }
 
@@ -139,15 +185,12 @@ body {
     color: #071a1a;
     list-style-type: none;
     padding: 0;
-    max-height: 500px;
-    /* Set max height */
+    max-height: 650px;
     overflow-y: auto;
-    /* Allow scrolling */
     scrollbar-color: hide;
 }
 
 .box-threads li {
-
     position: relative;
     padding: 15px;
     margin-bottom: 20px;
@@ -157,21 +200,25 @@ body {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.thread-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
 .box-threads li h3 {
     margin-bottom: 10px;
-    /* Adds space between the title and content */
 }
 
 .box-threads li p {
     margin-top: 10px;
-    /* Adds space between the title and content */
 }
 
 .replies-section {
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px solid #ccc;
-    /* Border to separate replies */
 }
 
 .replies-section h4 {
@@ -186,7 +233,6 @@ body {
 
 .replies-section input[type="text"] {
     flex-grow: 1;
-    /* Allow the input to take remaining space */
     padding: 8px;
     border-radius: 4px;
     border: 1px solid #ccc;
@@ -204,17 +250,29 @@ body {
 .delete-btn {
     position: absolute;
     top: 10px;
-    /* Adjust this value as needed */
     right: 10px;
-    /* Adjust this value as needed */
     font-size: 14px;
     cursor: pointer;
 }
 
-.like-bttn {}
+.like-bttn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
 
-/* app.js */
+.like-bttn.liked {
+    color: red;
+}
 
+.like-bttn:hover {
+    transform: scale(1.2);
+}
+/*view post************************************/
+
+/*app.js***************************************/
 .App {
     display: flex;
     justify-content: center;
@@ -280,6 +338,143 @@ h1 {
 .toggle-btn:hover {
     color: #0d8fe6;
 }
+/*app.js***************************************/
+
+/*Profiles.js***************************************/
+.profiles-container {
+    padding: 20px;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+}
+  
+.profiles-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #071a1a;
+}
+  
+.profiles-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+  
+.profile-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    max-width: 300px;
+    width: 100%;
+}
+  
+.profile-card h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+  
+.view-posts-btn {
+    background-color: #0c85d0;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+  
+.view-posts-btn:hover {
+    background-color: #0a6fae;
+}
+  
+.no-profiles {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #555;
+    margin-top: 50px;
+}
+/*Profiles.js***************************************/
+
+/*settings.js***************************************/
+.settings-container {
+    padding: 20px;
+}
+
+.settings-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.settings-details {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+  
+.settings-details p {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.loading-text {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #555;
+}
+
+.settings-update {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+}
+  
+.settings-update h2 {
+    font-size: 1.5rem;
+    color: #071a1a;
+    margin-bottom: 15px;
+}
+  
+.display-name-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+  
+.update-btn {
+    background-color: #0c85d0;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+  
+  .update-btn:hover {
+    background-color: #0a6fae;
+}
+
+.success-text {
+    color: green;
+    margin-top: 10px;
+}
+  
+.error-text {
+    color: red;
+    margin-top: 10px;
+}
+/*settings.js***************************************/
 
 .header {
     width: 100%;

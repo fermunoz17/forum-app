@@ -5,7 +5,7 @@ const Layout = ({ children }) => {
   return (
     <div>
       <TopBar />
-      <main style={{ marginTop: '100px' }}>
+      <main>
         {children}
       </main>
     </div>
