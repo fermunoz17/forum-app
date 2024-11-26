@@ -11,6 +11,7 @@ import {
     serverTimestamp,
     updateDoc,
     setDoc,
+    getDoc,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
@@ -96,60 +97,45 @@ const ViewPosts = () => {
             console.error('Error submitting reply:', err);
         }
     };
-
-    // const handleLike = async (threadId, authorId) => {
-    //     const currentUser = auth.currentUser;
-
-    //     // Prevent liking your own post
-    //     if (currentUser.uid === authorId) {
-    //         alert('You cannot like your own post.');
-    //         return;
-    //     }
-
-    //     const threadRef = doc(db, 'threads', threadId);
-
-    //     try {
-    //         // Increment the like count in Firestore
-    //         await updateDoc(threadRef, {
-    //             likes: increment(1),
-    //         });
-
-    //         console.log(`Like added to thread: ${threadId}`);
-    //     } catch (err) {
-    //         console.error('Error liking thread:', err);
-    //     }
-    // };
     // Handle liking/unliking a thread
     const handleLike = async (threadId) => {
-        const user = auth.currentUser;
+        const user = auth.currentUser; // Get the current user
         if (!user) {
             alert('You must be logged in to like a post.');
             return;
         }
 
-        const likeRef = doc(db, 'likes', user.uid, 'threadLikes', threadId);
-        const threadRef = doc(db, 'threads', threadId);
+        const likeRef = doc(db, 'likes', user.uid, 'threadLikes', threadId); // Reference to user's like on this thread
+        const threadRef = doc(db, 'threads', threadId); // Reference to the thread
 
         try {
             if (likedThreads.includes(threadId)) {
                 // Unlike the thread
-                await deleteDoc(likeRef);
+                await deleteDoc(likeRef); // Remove the like from the user's subcollection
                 await updateDoc(threadRef, {
-                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) - 1,
+                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) - 1, // Decrement the like count
                 });
+                setLikedThreads((prev) => prev.filter((id) => id !== threadId)); // Update local state
             } else {
+                // Check if the user has already liked the thread in Firestore
+                const likeSnapshot = await getDoc(likeRef);
+                if (likeSnapshot.exists()) {
+                    console.warn('User has already liked this post.');
+                    return; // Exit if already liked
+                }
+
                 // Like the thread
-                console.log("Before like"); 
-                // await setDoc(likeRef, { likedAt: serverTimestamp() });
+                await setDoc(likeRef, { likedAt: serverTimestamp() }); // Add like in user's subcollection
                 await updateDoc(threadRef, {
-                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) + 1,
+                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) + 1, // Increment the like count
                 });
-                console.log("After like"); 
+                setLikedThreads((prev) => [...prev, threadId]); // Update local state
             }
         } catch (err) {
             console.error('Error liking/unliking thread:', err);
         }
     };
+
 
     // Handle deleting a thread/post
     const handleDeleteThread = async (threadId, authorId) => {
@@ -191,9 +177,8 @@ const ViewPosts = () => {
 
                             <div className="thread-actions">
                                 <button
-                                    className={`like-bttn ${
-                                        likedThreads.includes(thread.id) ? 'liked' : ''
-                                    }`}
+                                    className={`like-bttn ${likedThreads.includes(thread.id) ? 'liked' : ''
+                                        }`}
                                     onClick={() => handleLike(thread.id)}
                                 >
                                     {likedThreads.includes(thread.id) ? '❤️' : '🤍'}
