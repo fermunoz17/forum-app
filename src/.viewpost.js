@@ -10,14 +10,14 @@ import {
     doc,
     serverTimestamp,
     updateDoc,
-    setDoc,
+    increment,
+    getDoc,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const ViewPosts = () => {
     const [threads, setThreads] = useState([]); // Stores threads/posts
-    const [likedThreads, setLikedThreads] = useState([]); // Tracks liked threads by the user
-    const [replies, setReplies] = useState({}); // Tracks replies for threads
+    const [replies, setReplies] = useState({}); // Stores replies for threads
     const [replyContent, setReplyContent] = useState({}); // Tracks reply input values
     const auth = getAuth();
     const db = getFirestore();
@@ -35,7 +35,7 @@ const ViewPosts = () => {
             // Fetch replies for each thread
             snapshot.docs.forEach((docSnapshot) => fetchReplies(docSnapshot.id));
         });
-        return () => unsubscribe();
+        return () => unsubscribe(); // Cleanup listener on unmount
     }, [db]);
 
     // Fetch replies for a specific thread
@@ -56,22 +56,6 @@ const ViewPosts = () => {
 
         return unsubscribe;
     };
-
-    // Fetch liked threads by the current user
-    useEffect(() => {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const likesRef = collection(db, 'likes', user.uid, 'threadLikes');
-        const q = query(likesRef);
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const likes = snapshot.docs.map((doc) => doc.id);
-            setLikedThreads(likes);
-        });
-
-        return () => unsubscribe();
-    }, [db, auth.currentUser]);
 
     // Handle submitting a reply
     const handleReplySubmit = async (e, threadId) => {
@@ -97,57 +81,27 @@ const ViewPosts = () => {
         }
     };
 
-    // const handleLike = async (threadId, authorId) => {
-    //     const currentUser = auth.currentUser;
+    // Handle liking a thread
+    const handleLike = async (threadId, authorId) => {
+        const currentUser = auth.currentUser;
 
-    //     // Prevent liking your own post
-    //     if (currentUser.uid === authorId) {
-    //         alert('You cannot like your own post.');
-    //         return;
-    //     }
-
-    //     const threadRef = doc(db, 'threads', threadId);
-
-    //     try {
-    //         // Increment the like count in Firestore
-    //         await updateDoc(threadRef, {
-    //             likes: increment(1),
-    //         });
-
-    //         console.log(`Like added to thread: ${threadId}`);
-    //     } catch (err) {
-    //         console.error('Error liking thread:', err);
-    //     }
-    // };
-    // Handle liking/unliking a thread
-    const handleLike = async (threadId) => {
-        const user = auth.currentUser;
-        if (!user) {
-            alert('You must be logged in to like a post.');
+        // Prevent liking your own post
+        if (currentUser.uid === authorId) {
+            alert('You cannot like your own post.');
             return;
         }
 
-        const likeRef = doc(db, 'likes', user.uid, 'threadLikes', threadId);
         const threadRef = doc(db, 'threads', threadId);
 
         try {
-            if (likedThreads.includes(threadId)) {
-                // Unlike the thread
-                await deleteDoc(likeRef);
-                await updateDoc(threadRef, {
-                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) - 1,
-                });
-            } else {
-                // Like the thread
-                console.log("Before like"); 
-                // await setDoc(likeRef, { likedAt: serverTimestamp() });
-                await updateDoc(threadRef, {
-                    likes: (threads.find((thread) => thread.id === threadId).likes || 0) + 1,
-                });
-                console.log("After like"); 
-            }
+            // Increment the like count in Firestore
+            await updateDoc(threadRef, {
+                likes: increment(1),
+            });
+
+            console.log(`Like added to thread: ${threadId}`);
         } catch (err) {
-            console.error('Error liking/unliking thread:', err);
+            console.error('Error liking thread:', err);
         }
     };
 
@@ -191,12 +145,10 @@ const ViewPosts = () => {
 
                             <div className="thread-actions">
                                 <button
-                                    className={`like-bttn ${
-                                        likedThreads.includes(thread.id) ? 'liked' : ''
-                                    }`}
-                                    onClick={() => handleLike(thread.id)}
+                                    className="like-bttn"
+                                    onClick={() => handleLike(thread.id, thread.authorId)}
                                 >
-                                    {likedThreads.includes(thread.id) ? '❤️' : '🤍'}
+                                    Like
                                 </button>
                                 <span>{thread.likes || 0} Likes</span>
 

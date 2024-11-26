@@ -85,11 +85,6 @@ const CreatePost = () => {
                 </div>
                 <button type="submit" className="submit-btn">Submit</button>
             </form>
-
-            {/* Back to Dashboard Button */}
-            <button onClick={handleBack} className="submit-btn back-btn">
-                Back to Dashboard
-            </button>
         </div>
     );
 };
