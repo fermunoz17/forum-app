@@ -11,6 +11,7 @@ import {
     serverTimestamp,
     updateDoc,
     increment,
+    getDoc,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
@@ -19,30 +20,12 @@ const ViewPosts = () => {
     const [threads, setThreads] = useState([]);
     const [replies, setReplies] = useState({});
     const [replyContent, setReplyContent] = useState({});
-
     const auth = getAuth();
     const db = getFirestore();
     const navigate = useNavigate();
 
+    // Fetch threads
     useEffect(() => {
-        const fetchReplies = (threadId) => {
-            const repliesRef = collection(db, 'threads', threadId, 'replies');
-            const q = query(repliesRef, orderBy('createdAt', 'asc'));
-
-            const unsubscribe = onSnapshot(q, (snapshot) => {
-                const threadReplies = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setReplies((prev) => ({
-                    ...prev,
-                    [threadId]: threadReplies,
-                }));
-            });
-
-            return unsubscribe;
-        };
-
         const q = query(collection(db, 'threads'), orderBy('createdAt', 'desc'));
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -52,14 +35,33 @@ const ViewPosts = () => {
             }));
             setThreads(threadsData);
 
-            snapshot.docs.forEach((docSnapshot) => {
-                fetchReplies(docSnapshot.id); // Fetch replies for the thread
-            });
+            // Fetch replies for each thread
+            snapshot.docs.forEach((docSnapshot) => fetchReplies(docSnapshot.id));
         });
 
-        return () => unsubscribe();
+        return () => unsubscribe(); // Cleanup listener when the component unmounts
     }, [db]);
 
+    // Fetch replies for a thread
+    const fetchReplies = (threadId) => {
+        const repliesRef = collection(db, 'threads', threadId, 'replies');
+        const q = query(repliesRef, orderBy('createdAt', 'asc'));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const threadReplies = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setReplies((prev) => ({
+                ...prev,
+                [threadId]: threadReplies,
+            }));
+        });
+
+        return unsubscribe;
+    };
+
+    // Handle submitting a reply
     const handleReplySubmit = async (e, threadId) => {
         e.preventDefault();
         const user = auth.currentUser;
@@ -74,18 +76,73 @@ const ViewPosts = () => {
             createdAt: serverTimestamp(),
         };
 
+        const notificationsRef = collection(db, 'notifications');
+        const threadRef = doc(db, 'threads', threadId);
+
         try {
+            // Add the reply to the subcollection
             await addDoc(collection(db, 'threads', threadId, 'replies'), reply);
+
+            // Fetch the thread details to get the original author
+            const threadDoc = await getDoc(threadRef);
+            if (threadDoc.exists()) {
+                const threadData = threadDoc.data();
+
+                // Create a notification for the original thread author (if the replier is not the author)
+                if (user.uid !== threadData.authorId) {
+                    await addDoc(notificationsRef, {
+                        userId: threadData.authorId,
+                        message: `${user.displayName || 'Someone'} replied to your post!`,
+                        postId: threadId,
+                        createdAt: serverTimestamp(),
+                    });
+                    console.log('Notification for reply created!');
+                }
+            }
+
+            // Reset the reply content field for the thread
             setReplyContent((prev) => ({ ...prev, [threadId]: '' }));
         } catch (err) {
-            console.error('Error submitting reply:', err);
+            console.error('Error submitting reply or creating notification:', err);
         }
     };
 
-    const handleReplyChange = (threadId, content) => {
-        setReplyContent((prev) => ({ ...prev, [threadId]: content }));
+    const handleLike = async (threadId, authorId) => {
+        const currentUser = auth.currentUser;
+    
+        // Prevent the user from liking their own post
+        if (currentUser.uid === authorId) {
+            alert("You cannot like your own post.");
+            return;
+        }
+    
+        const threadRef = doc(db, 'threads', threadId);
+        const notificationsRef = collection(db, 'notifications');
+    
+        try {
+            // Increment the like count in Firestore
+            await updateDoc(threadRef, {
+                likes: increment(1),
+            });
+    
+            console.log(`Like added to thread: ${threadId}`);
+    
+            // Create a notification for the author
+            const likerName = currentUser.displayName || 'Someone';
+            await addDoc(notificationsRef, {
+                userId: authorId,
+                message: `${likerName} liked your post!`,
+                postId: threadId,
+                createdAt: serverTimestamp(),
+            });
+            console.log('Notification created!');
+        } catch (err) {
+            console.error('Error liking thread or creating notification:', err);
+        }
     };
+    
 
+    // Handle deleting a thread
     const handleDeleteThread = async (threadId, authorId) => {
         const user = auth.currentUser;
         if (!user) {
@@ -100,23 +157,22 @@ const ViewPosts = () => {
 
         try {
             await deleteDoc(doc(db, 'threads', threadId));
-            setThreads(threads.filter((thread) => thread.id !== threadId));
+            setThreads((prevThreads) => prevThreads.filter((thread) => thread.id !== threadId));
+            console.log(`Thread ${threadId} deleted successfully.`);
         } catch (err) {
             console.error('Error deleting thread:', err);
         }
     };
 
-    const handleLike = async (threadId) => {
-        const threadRef = doc(db, 'threads', threadId);
-        try {
-            await updateDoc(threadRef, {
-                likes: increment(1),
-            });
-        } catch (err) {
-            console.error('Error liking thread:', err);
-        }
+    // Handle changes in the reply input
+    const handleReplyChange = (threadId, content) => {
+        setReplyContent((prev) => ({
+            ...prev,
+            [threadId]: content,
+        }));
     };
 
+    // Navigate back to the dashboard
     const handleBack = () => {
         navigate('/dashboard');
     };
@@ -136,7 +192,8 @@ const ViewPosts = () => {
                             </small>
 
                             <div className="thread-actions">
-                                <button className="like-bttn" onClick={() => handleLike(thread.id)}>Like</button>
+                                <button className="like-bttn" onClick={() => handleLike(thread.id, thread.authorId)}>Like</button>
+
                                 <span>{thread.likes || 0} Likes</span>
                             </div>
 

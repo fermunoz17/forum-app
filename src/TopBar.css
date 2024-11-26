@@ -16,9 +16,7 @@
 .logo {
   position: absolute;
   left: 10px;
-  /* Adjust as needed for padding from the left */
   height: 30px;
-  /* Adjust logo size */
   margin-top: -15px;
   cursor: pointer;
 }
@@ -26,12 +24,105 @@
 .title {
   margin-top: 20px;
   font-size: 30px;
-  /* Adjust text size */
   text-align: center;
 }
 
 .top-bar-bttn {
   background-color: transparent;
   border: none;
-  cursor: none;
+  cursor: pointer;
+}
+
+/* Icono de la "N" */
+.notification-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.n-icon {
+  font-size: 30px; /* Ajusta el tamaño según el diseño de la "Y" */
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #ff0000, #ff6363); /* Degradado similar al de la "Y" */
+  -webkit-background-clip: text; /* Para aplicar el degradado al texto */
+  -webkit-text-fill-color: transparent; /* Hace que solo el degradado sea visible */
+  cursor: pointer;
+}
+
+
+/* Contador de notificaciones */
+.notification-count {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Dropdown de notificaciones */
+.notification-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  background: white;
+  color: black;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  width: 200px;
+  z-index: 1000;
+  padding: 10px;
+}
+
+.notification-dropdown h4 {
+  margin: 0;
+  padding-bottom: 5px;
+  font-size: 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.notification-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-dropdown li {
+  padding: 5px 0;
+  font-size: 14px;
+  border-bottom: 1px solid #ddd;
+}
+
+.notification-dropdown li:last-child {
+  border-bottom: none;
+}
+
+.notification-dropdown p {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: #555;
+}
+
+.clear-btn {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.clear-btn:hover {
+  background-color: darkred;
 }
